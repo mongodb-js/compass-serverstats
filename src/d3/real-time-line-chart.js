@@ -1,5 +1,6 @@
 /* eslint complexity:0 */
 const d3 = require('d3');
+const realTimeLegend = require('./real-time-legend');
 
 /**
  * The data sets property.
@@ -238,7 +239,6 @@ function realTimeLineChart(mouseOverFunctions, mouseOutFunctions) {
       // Line setup
       const maxTime = data.localTime[data.localTime.length - 1];
       const minTime = new Date(maxTime.getTime() - (data.xLength * 1000));
-      const legendWidth = subWidth / data.keyLength;
       const scale2 = SECOND_SCALE in data;
       keys = data.dataSets.map(function(f) { return f.line; });
       if (scale2) {
@@ -357,67 +357,31 @@ function realTimeLineChart(mouseOverFunctions, mouseOutFunctions) {
       tick();
 
       // Legend
-      const l = container.selectAll('g.legend').data([0]);
-      l.enter()
-        .append('g')
-        .attr('class', 'legend')
-        .attr('width', subWidth)
-        .attr('height', margin.bottom)
-        .attr('transform', 'translate(' + margin.left + ',' + (subHeight + margin.top + subMargin) + ')');
-
-      const legendDiv = l.selectAll('g.subLegend').data(keys).enter()
-        .append('g')
-        .attr('class', 'subLegend')
-        .attr('transform', function(d, i) {
-          let minus = i * 5;
-          if (i === keys.length - 1) {
-            if (scale2) { // Set location if on separate axis.
-              return 'translate(' + (subWidth - 120) + ',0)';
-            }
-            minus = minus - 15;
-          }
-          return 'translate(' + ((i * legendWidth) - minus) + ',0)';
-        });
-      // Add boxes for legend
-      legendDiv
-        .append('rect')
-        .attr('class', function(d, i) { return 'chart-legend-box chart-color-' + i; })
-        .attr('id', function(d) { return 'box' + d; })
-        .attr('width', bubbleWidth)
-        .attr('height', bubbleWidth)
-        .attr('rx', bubbleWidth / 5)
-        .attr('ry', bubbleWidth / 5)
-
-        .on('click', function(d, i) {
+      const legend = realTimeLegend()
+        .width(subWidth)
+        .labels((fullData) => fullData.dataSets.map(f => f.line ))
+        .onToggle((d, i, active) => {
           let currLine;
           if (i >= data.dataSets.length && scale2) {
             currLine = data.secondScale;
           } else {
             currLine = data.dataSets[i];
           }
-          const active = currLine.active ? false : true;
           const newOpacity = active ? 1 : 0;
           d3.select('#tag' + d)
             .transition().duration(100)
             .style('opacity', newOpacity);
-          d3.select('#box' + d)
-            .transition().duration(100)
-            .style('fill-opacity', newOpacity);
-          d3.select('#bubble' + d)
-            .transition().duration(100)
-            .style('opacity', newOpacity);
           currLine.active = active;
         });
-      // Add text for legend
-      legendDiv
-        .append('text')
-        .attr('class', 'chart-legend-linename')
-        .attr('transform', 'translate(' + 13 + ',' + 9 + ')')
-        .text(function(d, i) {return data.labels.keys[i]; });
-      legendDiv
-        .append('text')
-        .attr('class', function(d) { return 'chart-legend-count text-' + d;} )
-        .attr('transform', 'translate(' + 15 + ',22)');
+
+      const l = container.selectAll('g.legend').data([data]);
+      l.enter()
+        .append('g')
+        .attr('class', 'legend')
+        .attr('width', subWidth)
+        .attr('height', margin.bottom)
+        .attr('transform', 'translate(' + margin.left + ',' + (subHeight + margin.top + subMargin) + ')');
+      l.call(legend);
 
       // Create overlay line
       const focus = container.selectAll('g.chart-focus').data([0]).enter()
