@@ -46,7 +46,7 @@ function realTimeLegend() {
         .attr('ry', bubbleWidth / 5)
         .on('click', function(d, i) {
           const rect = d3.select(this);
-          const active = rect.attr('fill') === color(i);
+          const active = rect.style('fill-opacity') !== '1';
           const newOpacity = active ? 1 : 0;
           rect.transition().duration(100)
             .style('fill-opacity', newOpacity);
