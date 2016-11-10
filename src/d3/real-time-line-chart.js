@@ -1,6 +1,7 @@
 /* eslint complexity:0 */
 const d3 = require('d3');
 const realTimeLegend = require('./real-time-legend');
+const realTimeChartLines = require('./real-time-chart-lines');
 
 /**
  * The data sets property.
@@ -93,12 +94,12 @@ const TRIGGER = 'trigger';
 function realTimeLineChart(mouseOverFunctions, mouseOutFunctions) {
   const x = d3.time.scale();
   const y = d3.scale.linear();
-  const y2 = d3.scale.linear();
+  // const y2 = d3.scale.linear();
   const bubbleWidth = 8;
   const margin = { top: 25, right: 40, bottom: 45, left: 55 };
   let width = 520;
   let height = 160;
-  let keys = [];
+  const keys = [];
   let onOverlay = false;
   let mouseLocation = null;
   let zeroState = true;
@@ -239,6 +240,36 @@ function realTimeLineChart(mouseOverFunctions, mouseOutFunctions) {
       // Line setup
       const maxTime = data.localTime[data.localTime.length - 1];
       const minTime = new Date(maxTime.getTime() - (data.xLength * 1000));
+      x
+        .domain([minTime, maxTime])
+        .range([0, subWidth]);
+      y
+        .domain(data.yDomain)
+        .range([subHeight, 0]);
+
+      const lines = realTimeChartLines()
+        .xScale(x)
+        .yScale(y)
+        .xVal((d, i) => data.localTime[i])
+        .yVal((d) => d)
+        .defined((d, i) => !data.skip[i])
+        .lines((selectionData) => selectionData.dataSets.map(dataSet => dataSet.count))
+        .singlePointDistance(x(1000) - x(0))
+        .expectedPointSpeed(1000);
+
+      const lineContainer = g.selectAll('.chart-line-group-container').data([data]);
+      lineContainer.enter()
+        .append('g')
+        .attr('class', 'chart-line-group-container');
+
+      lineContainer.call(lines);
+
+      const scale2 = SECOND_SCALE in data;
+
+      /*
+      // Line setup
+      const maxTime = data.localTime[data.localTime.length - 1];
+      const minTime = new Date(maxTime.getTime() - (data.xLength * 1000));
       const scale2 = SECOND_SCALE in data;
       keys = data.dataSets.map(function(f) { return f.line; });
       if (scale2) {
@@ -355,23 +386,18 @@ function realTimeLineChart(mouseOverFunctions, mouseOutFunctions) {
       }
 
       tick();
+      */
 
       // Legend
       const legend = realTimeLegend()
         .width(subWidth)
         .labels((fullData) => fullData.dataSets.map(f => f.line ))
         .onToggle((d, i, active) => {
-          let currLine;
-          if (i >= data.dataSets.length && scale2) {
-            currLine = data.secondScale;
-          } else {
-            currLine = data.dataSets[i];
-          }
           const newOpacity = active ? 1 : 0;
-          d3.select('#tag' + d)
+
+          lineContainer.selectAll('path.line').filter((pathD, pathI) => i === pathI)
             .transition().duration(100)
             .style('opacity', newOpacity);
-          currLine.active = active;
         });
 
       const l = container.selectAll('g.legend').data([data]);
