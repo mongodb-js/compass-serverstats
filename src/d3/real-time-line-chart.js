@@ -33,6 +33,7 @@ function realTimeLineChart() {
   let y2Label = (y2Value, /* i */) => y2Value.label;
   let defined = d => d.defined;
   let color = d3.scale.category10();
+  let animationDelay = 5000;
 
   function chart(selection) {
     selection.each(function(data) {
@@ -70,8 +71,8 @@ function realTimeLineChart() {
         .yData(yData)
         .color(color)
         .defined(defined)
-        .singlePointDistance(x(1000) - x(0))
-        .expectedPointSpeed(1000);
+        .singlePointDistance(x(animationDelay) - x(0))
+        .expectedPointSpeed(animationDelay);
 
       const lines2 = realTimeChartLines()
         .xScale(x)
@@ -81,8 +82,8 @@ function realTimeLineChart() {
         .yData(y2Data)
         .color((i) => color(i + yValues(data).length))
         .defined(defined)
-        .singlePointDistance(x(1000) - x(0))
-        .expectedPointSpeed(1000);
+        .singlePointDistance(x(animationDelay) - x(0))
+        .expectedPointSpeed(animationDelay);
 
       // Legend Configuration
       const legend = realTimeLegend()
@@ -380,6 +381,12 @@ function realTimeLineChart() {
   chart.prefix = function(value) {
     if (typeof value === 'undefined') return prefix;
     prefix = value;
+    return chart;
+  };
+
+  chart.animationDelay = function(value) {
+    if (typeof value === 'undefined') return animationDelay;
+    animationDelay = value;
     return chart;
   };
 

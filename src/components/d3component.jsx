@@ -52,6 +52,7 @@ class D3Component extends React.Component {
       .width(this.props.width)
       .height(this.props.height)
       .title(data.labels ? data.labels.title : 'Loading...')
+      .animationDelay(data.paused ? null : 1000)
 
       .xDomain([minTime, maxTime])
       .xVal((d, i) => data.localTime[i])

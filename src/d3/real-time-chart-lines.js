@@ -44,11 +44,14 @@ function realTimeChartLines() {
         .attr('stroke', (d, i) => color(i))
         .style('fill', 'none');
 
+      // draw the proper path
+      dataLines
+        .attr('d', (lineData, i) => line(yData(lineData, i)));
+
       // animate if animation parameters have been specified
       if (!isNaN(Number(singlePointDistance)) && expectedPointSpeed) {
         dataLines.interrupt('translate');
         dataLines
-          .attr('d', (lineData, i) => line(yData(lineData, i)))
           .attr('transform', isNaN(singlePointDistance) ? null : `translate(${singlePointDistance})`)
           .transition('translate')
             .duration(expectedPointSpeed)
