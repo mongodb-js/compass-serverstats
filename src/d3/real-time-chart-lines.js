@@ -1,11 +1,12 @@
 const d3 = require('d3');
 
 function realTimeChartLines() {
-  let lines = (data) => data.lines;
+  let lines = (data) => data;
   let xScale = d3.time.scale();
   let yScale = d3.scale.linear();
   let xVal = (datum) => datum.x;
   let yVal = (datum) => datum.y;
+  let yData = (yValue, /* i */) => yValue.data;
   let color = d3.scale.category10();
   let defined = () => true;
   let singlePointDistance;
@@ -16,22 +17,27 @@ function realTimeChartLines() {
   function component(selection) {
     selection.each(function(data) {
       const lineGroup = d3.select(this);
-      // Update lines + Animate smoothly
+
+      // establish the path-generating function for each line
       const line = d3.svg.line()
         .defined(defined)
         .interpolate('monotone')
         .x(x)
         .y(y);
 
-      lineGroup.append('defs').append('clipPath')
-        .attr('id', 'clip')
-        .append('rect')
-          .attr('width', Math.abs(xScale.range()[0] - xScale.range()[1]))
-          .attr('height', Math.abs(yScale.range()[0] - yScale.range()[1]));
+      // establish a clip-path to prevent the lines being drawn out of bounds
+      lineGroup.selectAll('defs').data([0]).enter()
+        .append('defs')
+          .append('clipPath')
+            .attr('id', 'clip')
+            .append('rect')
+              .attr('width', Math.abs(xScale.range()[0] - xScale.range()[1]))
+              .attr('height', Math.abs(yScale.range()[0] - yScale.range()[1]));
 
       lineGroup
           .attr('clip-path', 'url(#clip)');
 
+      // add the paths to the provided selection
       const dataLines = lineGroup.selectAll('path.line').data(lines(data), (d, i) => i);
       dataLines.enter().append('path')
         .attr('class', 'line')
@@ -40,11 +46,11 @@ function realTimeChartLines() {
 
       // animate if animation parameters have been specified
       if (!isNaN(Number(singlePointDistance)) && expectedPointSpeed) {
-        dataLines.interrupt();
+        dataLines.interrupt('translate');
         dataLines
-          .attr('d', line)
+          .attr('d', (lineData, i) => line(yData(lineData, i)))
           .attr('transform', isNaN(singlePointDistance) ? null : `translate(${singlePointDistance})`)
-          .transition()
+          .transition('translate')
             .duration(expectedPointSpeed)
             .ease(d3.ease('linear'))
             .attr('transform', 'translate(0)');
@@ -73,6 +79,12 @@ function realTimeChartLines() {
   component.yVal = function(value) {
     if (typeof value === 'undefined') return yVal;
     yVal = value;
+    return component;
+  };
+
+  component.yData = function(value) {
+    if (typeof value === 'undefined') return yData;
+    yData = value;
     return component;
   };
 

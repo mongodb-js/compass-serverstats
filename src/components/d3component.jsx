@@ -17,21 +17,13 @@ class D3Component extends React.Component {
   constructor(props) {
     super(props);
     this.state = { chart: null };
-    this.mouseOverFunctions = [
-      TopStore.mouseOver,
-      CurrentOpStore.mouseOver
-    ];
-    this.mouseOutFunctions = [
-      TopStore.mouseOut,
-      CurrentOpStore.mouseOut
-    ];
   }
 
   /**
    * Set the chart state of the component to the provided d3 function.
    */
   componentWillMount() {
-    this.setState({ chart: this.props.d3fn(this.mouseOverFunctions, this.mouseOutFunctions) });
+    this.setState({ chart: this.props.d3fn() });
   }
 
   /**
@@ -53,8 +45,42 @@ class D3Component extends React.Component {
    */
   redraw() {
     const el = ReactDOM.findDOMNode(this.refs.container);
-    this.state.chart.width(this.props.width).height(this.props.height);
-    d3.select(el).datum(this.props.data).call(this.state.chart);
+    const data = this.props.data;
+    const maxTime = data.localTime ? data.localTime[data.localTime.length - 1] : new Date();
+    const minTime = data.xLength ? new Date(maxTime.getTime() - (data.xLength * 1000)) : maxTime;
+    this.state.chart
+      .width(this.props.width)
+      .height(this.props.height)
+      .title(data.labels ? data.labels.title : 'Loading...')
+
+      .xDomain([minTime, maxTime])
+      .xVal((d, i) => data.localTime[i])
+      .xValues((selectionData) => selectionData.localTime)
+
+      .yDomain(data.yDomain || [0, 0])
+      .yVal(d => d)
+      .yValues((selectionData) => selectionData.dataSets)
+      .yUnits(data.labels ? data.labels.yAxis : '')
+      .yData((yValue) => yValue.count)
+      .yLabel((yValue) => yValue.line)
+
+      .y2Domain(data.secondScale ? [0, data.secondScale.currentMax] : null)
+      .y2Val(d => d)
+      .y2Values((selectionData) => selectionData.secondScale ? [selectionData.secondScale] : [])
+      .y2Units(data.secondScale ? data.secondScale.units : '')
+      .y2Data((y2Value) => y2Value.count)
+      .y2Label((y2Value) => y2Value.line)
+
+      .defined((d, i) => !data.skip[i])
+      .color((i) => ['#45BAAB', '#23B1FF', '#6F72FF', '#A33A35', '#FFA900', '#C7E82F'][i])
+      .on('mouseover', TopStore.mouseOver)
+      .on('mouseover', CurrentOpStore.mouseOver)
+      .on('mouseout', TopStore.mouseOut)
+      .on('mouseout', CurrentOpStore.mouseOut);
+
+    d3.select(el)
+      .datum(this.props.data)
+      .call(this.state.chart);
   }
 
   /**
@@ -65,7 +91,7 @@ class D3Component extends React.Component {
   render() {
     return (
       <div ref="wrapper" className="d3component">
-        <svg ref="container" width={this.props.width} height={this.props.height}></svg>
+        <div ref="container"></div>
       </div>
     );
   }
