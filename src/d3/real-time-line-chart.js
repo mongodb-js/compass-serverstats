@@ -86,10 +86,12 @@ function realTimeLineChart() {
         .expectedPointSpeed(animationDelay);
 
       // Legend Configuration
+      const legendClass = `${prefix}-legend`;
       const legend = realTimeLegend()
         .label(yLabel)
         .yData(yData)
         .color(color)
+        .prefix(legendClass)
         .onToggle((d, i, active) => {
           const newOpacity = active ? 1 : 0;
 
@@ -105,6 +107,7 @@ function realTimeLineChart() {
         .yData(y2Data)
         .justifyContent('flex-end')
         .color((i) => color(i + yValues(data).length))
+        .prefix(legendClass)
         .onToggle((d, i, active) => {
           const newOpacity = active ? 1 : 0;
 
@@ -207,11 +210,11 @@ function realTimeLineChart() {
       container.selectAll(`span.${maxYValueClass}`)
         .text(d3.format('s')(yDomain[1]));
       container.selectAll(`span.${maxYUnitsClass}`)
-        .text(yUnits);
+        .text(` ${yUnits}`);
       container.selectAll(`span.${maxY2ValueClass}`)
         .text(y2Domain ? d3.format('s')(y2Domain[1]) : '');
       container.selectAll(`span.${maxY2UnitsClass}`)
-        .text(y2Units);
+        .text(` ${y2Units}`);
 
       const legendContainerClass = `${prefix}-legend-container`;
       const fullLegendContainer = container.selectAll(`div.${legendContainerClass}`).data([0]);
@@ -223,7 +226,6 @@ function realTimeLineChart() {
         .style('display', 'flex')
         .style('justify-content', 'space-between');
 
-      const legendClass = `${prefix}-legend`;
       const l = fullLegendContainer.selectAll(`div.${legendClass}`).data([yValues(data)]);
       l.enter()
         .append('div')

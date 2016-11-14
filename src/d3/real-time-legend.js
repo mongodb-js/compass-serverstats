@@ -2,6 +2,7 @@ const d3 = require('d3');
 
 function realTimeLegend() {
   let label = d => d.label;
+  let prefix = 'legend';
   let color = d3.scale.category10();
   let bubbleWidth = 8;
   let onToggle = function(/* d, i, active */) { /* no-op */ };
@@ -12,12 +13,12 @@ function realTimeLegend() {
     selection.each(function(data) {
       // Legend
       const legendGroup = d3.select(this);
-      const legendDiv = legendGroup.selectAll('div.legend-item').data(data).enter()
+      const legendDiv = legendGroup.selectAll(`div.${prefix}-item`).data(data).enter()
         .append('div')
         .style('display', 'flex')
         .style('flex-grow', '1')
         .style('justify-content', justifyContent)
-        .attr('class', 'legend-item');
+        .attr('class', `${prefix}-item`);
 
 
       // Add boxes for legend
@@ -27,7 +28,7 @@ function realTimeLegend() {
         .append('rect')
           .attr('fill', (d, i) => color(i))
           .attr('stroke', (d, i) => color(i))
-          .attr('class', 'chart-legend-box')
+          .attr('class', `${prefix}-box`)
           .attr('width', bubbleWidth)
           .attr('height', bubbleWidth)
           .attr('x', 1)
@@ -47,14 +48,14 @@ function realTimeLegend() {
       const textSection = legendDiv.append('div');
       textSection
         .append('p')
-        .attr('class', 'chart-legend-linename')
+        .attr('class', `${prefix}-linename`)
         .text(label);
 
       textSection
         .append('p')
-        .attr('class', 'chart-legend-count');
+        .attr('class', `${prefix}-count`);
 
-      const valueText = legendGroup.selectAll('p.chart-legend-count');
+      const valueText = legendGroup.selectAll(`p.${prefix}-count`);
 
       component.showValues = function(nearestXIndex) {
         valueText.text((d, i) => yData(d, i)[nearestXIndex]);
@@ -95,6 +96,12 @@ function realTimeLegend() {
   component.yData = function(value) {
     if (typeof value === 'undefined') return yData;
     yData = value;
+    return component;
+  };
+
+  component.prefix = function(value) {
+    if (typeof value === 'undefined') return prefix;
+    prefix = value;
     return component;
   };
 
