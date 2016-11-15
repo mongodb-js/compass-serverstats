@@ -4,6 +4,7 @@ function realTimeMouseOverlay() {
   const dispatch = d3.dispatch('mouseover', 'reposition', 'mouseout');
   let prefix = 'serverstats-overlay';
   let bubbleWidth = 30;
+  let strokeWidth = 1;
 
   function component(selection) {
     selection.each(function(data) {
@@ -30,7 +31,9 @@ function realTimeMouseOverlay() {
           .attr('stroke', 'white')
           .attr('fill', 'white')
           .attr('class', `${prefix}-triangle`)
-          .attr('d', d3.svg.symbol().type('triangle-down').size(bubbleWidth * 3));
+          .attr('d', d3.svg.symbol().type('triangle-down').size(bubbleWidth * 3))
+          .attr('stroke', 'white')
+          .attr('stroke-width', strokeWidth);
 
       // Create mouse target for overlay events
       let updateMousePosition;
@@ -88,6 +91,12 @@ function realTimeMouseOverlay() {
   component.prefix = function(value) {
     if (typeof value === 'undefined') return prefix;
     prefix = value;
+    return component;
+  };
+
+  component.strokeWidth = function(value) {
+    if (typeof value === 'undefined') return strokeWidth;
+    strokeWidth = value;
     return component;
   };
 

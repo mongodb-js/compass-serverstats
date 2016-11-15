@@ -33,6 +33,7 @@ function realTimeLineChart() {
   let y2Label = (y2Value, /* i */) => y2Value.label;
   let defined = d => d.defined;
   let color = d3.scale.category10();
+  let strokeWidth = 1;
   let animationDelay = 5000;
 
   function chart(selection) {
@@ -55,10 +56,10 @@ function realTimeLineChart() {
         .range([0, subWidth]);
       y
         .domain(yDomain)
-        .range([subHeight, 0]);
+        .range([subHeight - strokeWidth, strokeWidth / 2]);
       y2
         .domain(y2Domain ? y2Domain : [0, 0])
-        .range([subHeight, 0]);
+        .range([subHeight - strokeWidth, strokeWidth / 2]);
 
       // Lines configuration
       let lineContainer = null;
@@ -71,6 +72,7 @@ function realTimeLineChart() {
         .yData(yData)
         .color(color)
         .defined(defined)
+        .strokeWidth(strokeWidth)
         .singlePointDistance(x(animationDelay) - x(0))
         .expectedPointSpeed(animationDelay);
 
@@ -82,6 +84,7 @@ function realTimeLineChart() {
         .yData(y2Data)
         .color((i) => color(i + yValues(data).length))
         .defined(defined)
+        .strokeWidth(strokeWidth)
         .singlePointDistance(x(animationDelay) - x(0))
         .expectedPointSpeed(animationDelay);
 
@@ -122,10 +125,15 @@ function realTimeLineChart() {
       function getNearestXIndex(xPosition) {
         const xValue = x.invert(xPosition);
         const bisectPosition = d3.bisectLeft(xValues(data), xValue);
-        return Math.min(bisectPosition, xValues(data).length - 1);
+        let nearestDefinedPoint = Math.min(bisectPosition, xValues(data).length - 1);
+        while (!defined(null, nearestDefinedPoint)) {
+          nearestDefinedPoint++;
+        }
+        return nearestDefinedPoint;
       }
       const mouseOverlay = realTimeMouseOverlay()
         .bubbleWidth(8)
+        .strokeWidth(2)
         .on('reposition', (xPosition) => {
           const nearestXIndex = getNearestXIndex(xPosition);
           legend.showValues(nearestXIndex);
@@ -254,141 +262,334 @@ function realTimeLineChart() {
     });
   }
 
-  // Configuration Getters & Setters
+  /**
+   * Control the overall width of the chart including titles margins, labels, and legend
+   *
+   * @param {Number} value - The new width of the chart
+   *
+   * @returns {Function|Number} The chart component, or the existing value if none supplied
+   */
   chart.width = function(value) {
     if (typeof value === 'undefined') return width;
     width = value;
     return chart;
   };
 
+  /**
+   * Control the overall height of the chart including titles margins, labels, and legend
+   *
+   * @param {Number} value - The new height of the chart
+   *
+   * @returns {Function|Number} The chart component, or the existing value if none supplied
+   */
   chart.height = function(value) {
     if (typeof value === 'undefined') return height;
     height = value;
     return chart;
   };
 
+  /**
+   * The title to be displayed at the top of the chart
+   *
+   * @param {String} value - The new title of the chart
+   *
+   * @returns {Function|String} The chart component, or the existing value if none supplied
+   */
   chart.title = function(value) {
     if (typeof value === 'undefined') return title;
     title = value;
     return chart;
   };
 
+  /**
+   * Set the domain of possible values for the chart.
+   *
+   * @param {Array} value - The new domain. For a smooth chart, the bounds of the range should always subtract to the same
+   * value, the maximum timespan to show on the chart
+   *
+   * @returns {Function|Array} The chart component, or the existing value if none supplied
+   */
   chart.xDomain = function(value) {
     if (typeof value === 'undefined') return xDomain;
     xDomain = value;
     return chart;
   };
 
+  /**
+   * The domain of y values on the left axis of the chart
+   *
+   * @param {Array} value - The new domain
+   *
+   * @returns {Function|Array} The chart component, or the existing value if none supplied
+   */
   chart.yDomain = function(value) {
     if (typeof value === 'undefined') return yDomain;
     yDomain = value;
     return chart;
   };
 
+  /**
+   * The domain of y values on the right axis of the chart. If
+   * only one axis is needed, this value can be ignored
+   *
+   * @param {Array} value - The new domain
+   *
+   * @returns {Function|Array} The chart component, or the existing value if none supplied
+   */
   chart.y2Domain = function(value) {
     if (typeof value === 'undefined') return y2Domain;
     y2Domain = value;
     return chart;
   };
 
+  /**
+   * Set the xVal accessor.
+   *
+   * @param {Function} value - A function that, given a datum from yData or y2Data and that datum's index provides the value
+   * of x for that datum
+   *
+   * @returns {Function} The chart component, or the existing value if none supplied
+   */
   chart.xVal = function(value) {
     if (typeof value === 'undefined') return xVal;
     xVal = value;
     return chart;
   };
 
+  /**
+   * Set the xValues accessor
+   *
+   * @param {Function} value - A function that, given the data bound to the selection returns an ordered array of all the
+   * xValues represented in the data set in the same order as the data from yValues and y2Values
+   *
+   * @returns {Function} The chart component, or the existing value if none supplied
+   */
   chart.xValues = function(value) {
     if (typeof value === 'undefined') return xValues;
     xValues = value;
     return chart;
   };
 
+  /**
+   * Set the yVal accessor
+   *
+   * @param {Function} value - A function that, given a datum from yData and that datum's index, provides the y value for
+   * that datum
+   *
+   * @returns {Function} The chart component, or the existing value if none supplied
+   */
   chart.yVal = function(value) {
     if (typeof value === 'undefined') return yVal;
     yVal = value;
     return chart;
   };
 
+  /**
+   * Set the units for the left axis of the chart
+   *
+   * @param {String} value - A string denoting the units for the left axis of the chart
+   *
+   * @returns {Function|String} The chart component, or the existing value if none supplied
+   */
   chart.yUnits = function(value) {
     if (typeof value === 'undefined') return yUnits;
     yUnits = value;
     return chart;
   };
 
+  /**
+   *  Set the y2Val accessor
+   *
+   * @param {Function} value - A function that, given a datum from y2Data and that datum's index, provides the y value for
+   * that datum
+   *
+   * @returns {Function} The chart component, or the existing value if none supplied
+   */
   chart.y2Val = function(value) {
     if (typeof value === 'undefined') return y2Val;
     y2Val = value;
     return chart;
   };
 
+  /**
+   * Set the units for the right axis of the chart
+   *
+   * @param {String} value - A string denoting the units for the right axis of the chart
+   *
+   * @returns {Function|String} The chart component, or the existing value if none supplied
+   */
   chart.y2Units = function(value) {
     if (typeof value === 'undefined') return y2Units;
     y2Units = value;
     return chart;
   };
 
+  /**
+   * Set the yValues accessor
+   *
+   * @param {Function} value - A function that, given the data bound to the selection returns an array of items with each
+   * item representing one line to be drawn for the left axis
+   *
+   * @returns {Function} The chart component, or the existing value if none supplied
+   */
   chart.yValues = function(value) {
     if (typeof value === 'undefined') return yValues;
     yValues = value;
     return chart;
   };
 
+  /**
+   * Set the yData accessor
+   *
+   * @param {Function} value - A function that, given one of the items returned by yValues, outputs and array of data points
+   * for which to draw a line
+   *
+   * @returns {Function} The chart component, or the existing value if none supplied
+   */
   chart.yData = function(value) {
     if (typeof value === 'undefined') return yData;
     yData = value;
     return chart;
   };
 
+  /**
+   * Set the yLabel accessor
+   *
+   * @param {Function} value - A function that, given one of the items returned by yValues, outputs the label for that line
+   * to be shown in the legend
+   *
+   * @returns {Function} The chart component, or the existing value if none supplied
+   */
   chart.yLabel = function(value) {
     if (typeof value === 'undefined') return yLabel;
     yLabel = value;
     return chart;
   };
 
+  /**
+   * Set the y2Values accessor
+   *
+   * @param {Function} value - A function that, given the data bound to the selection returns an array of items with each
+   * item representing one line to be drawn for the right axis
+   *
+   * @returns {Function} The chart component, or the existing value if none supplied
+   */
   chart.y2Values = function(value) {
     if (typeof value === 'undefined') return y2Values;
     y2Values = value;
     return chart;
   };
 
+  /**
+   * Set the y2Data accessor
+   *
+   * @param {Function} value - A function that, given one of the items returned by y2Values, outputs and array of data points
+   * for which to draw a line
+   *
+   * @returns {Function} The chart component, or the existing value if none supplied
+   */
   chart.y2Data = function(value) {
     if (typeof value === 'undefined') return y2Data;
     y2Data = value;
     return chart;
   };
 
+  /**
+   * Set the y2Label accessor
+   *
+   * @param {Function} value - A function that, given one of the items returned by y2Values, outputs the label for that line
+   * to be shown in the legend
+   *
+   * @returns {Function} The chart component, or the existing value if none supplied
+   */
   chart.y2Label = function(value) {
     if (typeof value === 'undefined') return y2Label;
     y2Label = value;
     return chart;
   };
 
+  /**
+   * Set the defined accessor
+   *
+   * @Param {Function} value - A function that, given an item from yData or y2Data, and the index of that value, returns true
+   * if a line should be drawn through that point, or if it should be skipped. Can also be given `null` and an index if only
+   * an xValue is known.
+   *
+   * @returns {Function} The chart component, or the existing value if none supplied
+   */
   chart.defined = function(value) {
     if (typeof value === 'undefined') return defined;
     defined = value;
     return chart;
   };
 
+  /**
+   * Set the color accessor
+   *
+   * @param {Function} value - A function that, given the index of a line in the data
+   * set, returns a color to draw the line as
+   *
+   * @returns {Function} The chart component, or the existing value if none supplied
+   */
   chart.color = function(value) {
     if (typeof value === 'undefined') return color;
     color = value;
     return chart;
   };
 
-  chart.on = function(event, cb) {
-    dispatch.on(event, cb);
+  /**
+   * Allows binding to 'mouseover', 'mousemove', and 'mouseout'
+   * events on the chart. 'mouseover', and 'mousemove' events
+   * are triggered with the index of the nearest xValue to the
+   * event
+   *
+   * @param {String} event - The event to listen for
+   * @param {Function} listener - The callback to be called when the event occurs
+   *
+   * @returns {Function} The chart component
+   */
+  chart.on = function(event, listener) {
+    dispatch.on(event, listener);
     return chart;
   };
 
+  /**
+   * Set the CSS prefix for all the elements in the chart
+   *
+   * @param {String} value - The prefix to be preprended to every class in the component
+   *
+   * @returns {Function|String} The chart component, or the existing value if none supplied
+   */
   chart.prefix = function(value) {
     if (typeof value === 'undefined') return prefix;
     prefix = value;
     return chart;
   };
 
+  /**
+   * Set the animation delay for the chart
+   *
+   * @param {Number} value - The rate at which points are expected to be added to the data in milliseconds, and by which each
+   * point's xVal is expected to differe from the last one's.
+   *
+   * @returns {Function|Number} The chart component, or the existing value if none supplied
+   */
   chart.animationDelay = function(value) {
     if (typeof value === 'undefined') return animationDelay;
     animationDelay = value;
+    return chart;
+  };
+
+  /**
+   * Set the stroke width for the lines on the chart
+   *
+   * @param {Number} strokeWidth - The new strokeWidth for the chart lines
+   *
+   * @returns {Function|Number} The chart component, or the existing value if none supplied
+   */
+  chart.strokeWidth = function(value) {
+    if (typeof value === 'undefined') return strokeWidth;
+    strokeWidth = value;
     return chart;
   };
 

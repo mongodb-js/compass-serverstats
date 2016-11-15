@@ -74,6 +74,7 @@ class D3Component extends React.Component {
 
       .defined((d, i) => !data.skip[i])
       .color((i) => ['#45BAAB', '#23B1FF', '#6F72FF', '#A33A35', '#FFA900', '#C7E82F'][i])
+      .strokeWidth(2)
       .on('mouseover', TopStore.mouseOver)
       .on('mouseover', CurrentOpStore.mouseOver)
       .on('mouseout', TopStore.mouseOut)

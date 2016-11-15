@@ -8,6 +8,7 @@ function realTimeChartLines() {
   let yVal = (datum) => datum.y;
   let yData = (yValue, /* i */) => yValue.data;
   let color = d3.scale.category10();
+  let strokeWidth = 1;
   let defined = () => true;
   let singlePointDistance;
   let expectedPointSpeed;
@@ -32,7 +33,7 @@ function realTimeChartLines() {
             .attr('id', 'clip')
             .append('rect')
               .attr('width', Math.abs(xScale.range()[0] - xScale.range()[1]))
-              .attr('height', Math.abs(yScale.range()[0] - yScale.range()[1]));
+              .attr('height', Math.abs(yScale.range()[0] - yScale.range()[1]) + strokeWidth);
 
       lineGroup
           .attr('clip-path', 'url(#clip)');
@@ -41,6 +42,7 @@ function realTimeChartLines() {
       const dataLines = lineGroup.selectAll('path.line').data(lines(data), (d, i) => i);
       dataLines.enter().append('path')
         .attr('class', 'line')
+        .attr('stroke-width', strokeWidth)
         .attr('stroke', (d, i) => color(i))
         .style('fill', 'none');
 
@@ -118,6 +120,12 @@ function realTimeChartLines() {
   component.expectedPointSpeed = function(value) {
     if (typeof value === 'undefined') return expectedPointSpeed;
     expectedPointSpeed = value;
+    return component;
+  };
+
+  component.strokeWidth = function(value) {
+    if (typeof value === 'undefined') return strokeWidth;
+    strokeWidth = value;
     return component;
   };
 
