@@ -4,6 +4,8 @@ const d3 = require('d3');
 const TopStore = require('../stores/top-store');
 const CurrentOpStore = require('../stores/current-op-store');
 
+const LINE_COLORS = ['#45BAAB', '#23B1FF', '#6F72FF', '#A33A35', '#FFA900', '#C7E82F'];
+
 /**
  * Encapsulates behaviour for a react component that wraps a d3 chart.
  */
@@ -59,21 +61,21 @@ class D3Component extends React.Component {
       .xValues((selectionData) => selectionData.localTime)
 
       .yDomain(data.yDomain || [0, 0])
-      .yVal(d => d)
+      .yVal((d) => d)
       .yValues((selectionData) => selectionData.dataSets)
       .yUnits(data.labels ? data.labels.yAxis : '')
       .yData((yValue) => yValue.count)
       .yLabel((yValue) => yValue.line)
 
       .y2Domain(data.secondScale ? [0, data.secondScale.currentMax] : null)
-      .y2Val(d => d)
+      .y2Val((d) => d)
       .y2Values((selectionData) => selectionData.secondScale ? [selectionData.secondScale] : [])
       .y2Units(data.secondScale ? data.secondScale.units : '')
       .y2Data((y2Value) => y2Value.count)
       .y2Label((y2Value) => y2Value.line)
 
       .defined((d, i) => !data.skip[i])
-      .color((i) => ['#45BAAB', '#23B1FF', '#6F72FF', '#A33A35', '#FFA900', '#C7E82F'][i])
+      .color(d3.scale.ordinal().range(LINE_COLORS))
       .strokeWidth(2)
       .on('mouseover', TopStore.mouseOver)
       .on('mouseover', CurrentOpStore.mouseOver)
