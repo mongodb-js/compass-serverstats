@@ -583,7 +583,7 @@ function realTimeLineChart() {
   /**
    * Set the stroke width for the lines on the chart
    *
-   * @param {Number} strokeWidth - The new strokeWidth for the chart lines
+   * @param {Number} value - The new strokeWidth for the chart lines
    *
    * @returns {Function|Number} The chart component, or the existing value if none supplied
    */
