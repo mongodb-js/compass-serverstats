@@ -35,16 +35,15 @@ function realTimeLineChart() {
   let color = d3.scale.category10();
   let strokeWidth = 1;
   let animationDelay = 5000;
+  let singlePointTime = 5000;
+  let yFormat = (d) => d;
+  let y2Format = (d) => d;
+  let enableMouse = true;
 
   function chart(selection) {
     selection.each(function(data) {
       const subHeight = height - margin.top - margin.bottom;
       const subWidth = width - margin.left - margin.right;
-
-      // TODO: Handle 0-state and bad data and error state (see original code)
-      if (!data.localTime) {
-        return;
-      }
 
       /*
        * Setup Components
@@ -73,7 +72,7 @@ function realTimeLineChart() {
         .color(color)
         .defined(defined)
         .strokeWidth(strokeWidth)
-        .singlePointDistance(x(animationDelay) - x(0))
+        .singlePointDistance(x(singlePointTime) - x(0))
         .expectedPointSpeed(animationDelay);
 
       const lines2 = realTimeChartLines()
@@ -85,7 +84,7 @@ function realTimeLineChart() {
         .color((i) => color(i + yValues(data).length))
         .defined(defined)
         .strokeWidth(strokeWidth)
-        .singlePointDistance(x(animationDelay) - x(0))
+        .singlePointDistance(x(singlePointTime) - x(0))
         .expectedPointSpeed(animationDelay);
 
       // Legend Configuration
@@ -95,6 +94,7 @@ function realTimeLineChart() {
         .yData(yData)
         .color(color)
         .prefix(legendClass)
+        .format(yFormat)
         .onToggle((d, i, active) => {
           const newOpacity = active ? 1 : 0;
 
@@ -111,6 +111,7 @@ function realTimeLineChart() {
         .justifyContent('flex-end')
         .color((i) => color(i + yValues(data).length))
         .prefix(legendClass)
+        .format(y2Format)
         .onToggle((d, i, active) => {
           const newOpacity = active ? 1 : 0;
 
@@ -134,6 +135,7 @@ function realTimeLineChart() {
       const mouseOverlay = realTimeMouseOverlay()
         .bubbleWidth(8)
         .strokeWidth(2)
+        .enableMouse(enableMouse)
         .on('reposition', (xPosition) => {
           const nearestXIndex = getNearestXIndex(xPosition);
           legend.showValues(nearestXIndex);
@@ -216,11 +218,11 @@ function realTimeLineChart() {
 
       // Update labels
       container.selectAll(`span.${maxYValueClass}`)
-        .text(d3.format('s')(yDomain[1]));
+        .text(yFormat(yDomain[1]));
       container.selectAll(`span.${maxYUnitsClass}`)
         .text(` ${yUnits}`);
       container.selectAll(`span.${maxY2ValueClass}`)
-        .text(y2Domain ? d3.format('s')(y2Domain[1]) : '');
+        .text(y2Domain ? y2Format(y2Domain[1]) : '');
       container.selectAll(`span.${maxY2UnitsClass}`)
         .text(` ${y2Units}`);
 
@@ -398,6 +400,19 @@ function realTimeLineChart() {
   };
 
   /**
+   * Set a formatter for data on the left axis
+   *
+   * @param {Function} value - A function that converts a data point to a string representation
+   *
+   * @returns {Function} The chart component, or the existing value if non supplied
+   */
+  chart.yFormat = function(value) {
+    if (typeof value === 'undefined') return yFormat;
+    yFormat = value;
+    return chart;
+  };
+
+  /**
    *  Set the y2Val accessor
    *
    * @param {Function} value - A function that, given a datum from y2Data and that datum's index, provides the y value for
@@ -421,6 +436,19 @@ function realTimeLineChart() {
   chart.y2Units = function(value) {
     if (typeof value === 'undefined') return y2Units;
     y2Units = value;
+    return chart;
+  };
+
+  /**
+   * Set a formatter for data on the right axis
+   *
+   * @param {Function} value - A function that converts a data point to a string representation
+   *
+   * @returns {Function} The chart component, or the existing value if non supplied
+   */
+  chart.y2Format = function(value) {
+    if (typeof value === 'undefined') return y2Format;
+    y2Format = value;
     return chart;
   };
 
@@ -581,6 +609,19 @@ function realTimeLineChart() {
   };
 
   /**
+   * Set the amount of time between each x value on the chart for animation
+   *
+   * @param {Number} value - The expected difference from one x value to the next
+   *
+   * @returns {Function|Number} The chart component, or the existing value if none supplied
+   */
+  chart.singlePointTime = function(value) {
+    if (typeof value === 'undefined') return singlePointTime;
+    singlePointTime = value;
+    return chart;
+  };
+
+  /**
    * Set the stroke width for the lines on the chart
    *
    * @param {Number} value - The new strokeWidth for the chart lines
@@ -590,6 +631,19 @@ function realTimeLineChart() {
   chart.strokeWidth = function(value) {
     if (typeof value === 'undefined') return strokeWidth;
     strokeWidth = value;
+    return chart;
+  };
+
+  /**
+   * Set whether or not to allow mouse interactions with the cart
+   *
+   * @param {Boolean} value - true if mouse interactions are allowed, false otherwise
+   *
+   * @returns {Function|Boolean} The chart component, or the existing value if none supplied
+   */
+  chart.enableMouse = function(value) {
+    if (typeof value === 'undefined') return enableMouse;
+    enableMouse = value;
     return chart;
   };
 

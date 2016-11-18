@@ -7,6 +7,7 @@ function realTimeLegend() {
   let bubbleWidth = 8;
   let onToggle = function(/* d, i, active */) { /* no-op */ };
   let justifyContent = 'flex-start';
+  let format = (d) => d;
   let yData = (yValues, /* i */) => yValues.data;
 
   function component(selection) {
@@ -45,7 +46,8 @@ function realTimeLegend() {
           });
 
       // Add text for legend
-      const textSection = legendDiv.append('div');
+      const textSection = legendDiv.append('div')
+        .attr('class', `${prefix}-text`);
       textSection
         .append('p')
         .attr('class', `${prefix}-linename`)
@@ -58,7 +60,7 @@ function realTimeLegend() {
       const valueText = legendGroup.selectAll(`p.${prefix}-count`);
 
       component.showValues = function(nearestXIndex) {
-        valueText.text((d, i) => yData(d, i)[nearestXIndex]);
+        valueText.text((d, i) => format(yData(d, i)[nearestXIndex]));
       };
     });
   }
@@ -102,6 +104,12 @@ function realTimeLegend() {
   component.prefix = function(value) {
     if (typeof value === 'undefined') return prefix;
     prefix = value;
+    return component;
+  };
+
+  component.format = function(value) {
+    if (typeof value === 'undefined') return format;
+    format = value;
     return component;
   };
 

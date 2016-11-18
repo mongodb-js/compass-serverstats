@@ -5,6 +5,7 @@ function realTimeMouseOverlay() {
   let prefix = 'serverstats-overlay';
   let bubbleWidth = 30;
   let strokeWidth = 1;
+  let enableMouse = true;
 
   function component(selection) {
     selection.each(function(data) {
@@ -46,7 +47,7 @@ function realTimeMouseOverlay() {
       }
 
       const mouseTarget = svg.selectAll(`rect.${prefix}-mouse-target`).data([data]);
-      mouseTarget.enter()
+      const mouseTargetEnter = mouseTarget.enter()
         .append('rect')
         .attr('height', height - (bubbleWidth / 2))
         .attr('width', width - bubbleWidth)
@@ -54,18 +55,22 @@ function realTimeMouseOverlay() {
         .attr('fill', 'none')
         .attr('stroke', 'none')
         .attr('transform', `translate(${bubbleWidth / 2}, ${bubbleWidth / 2})`)
-        .style('pointer-events', 'visible')
-        .on('mouseover', function() {
-          const xPosition = d3.mouse(this)[0];
-          dispatch.mouseover(xPosition);
-        })
-        .on('mousemove', sendMouseEvents)
-        .on('mouseout', function() {
-          clearInterval(updateMousePosition);
-          overlayGroup.attr('transform', `translate(${basePosition})`);
-          dispatch.reposition(basePosition);
-          dispatch.mouseout();
-        });
+        .style('pointer-events', 'visible');
+
+      if (enableMouse) {
+        mouseTargetEnter
+          .on('mouseover', function() {
+            const xPosition = d3.mouse(this)[0];
+            dispatch.mouseover(xPosition);
+          })
+          .on('mousemove', sendMouseEvents)
+          .on('mouseout', function() {
+            clearInterval(updateMousePosition);
+            overlayGroup.attr('transform', `translate(${basePosition})`);
+            dispatch.reposition(basePosition);
+            dispatch.mouseout();
+          });
+      }
 
       if (overlayGroup.attr('transform') === `translate(${basePosition})`) {
         dispatch.reposition(basePosition);
@@ -97,6 +102,12 @@ function realTimeMouseOverlay() {
   component.strokeWidth = function(value) {
     if (typeof value === 'undefined') return strokeWidth;
     strokeWidth = value;
+    return component;
+  };
+
+  component.enableMouse = function(value) {
+    if (typeof value === 'undefined') return enableMouse;
+    enableMouse = value;
     return component;
   };
 

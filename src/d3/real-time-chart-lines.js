@@ -1,7 +1,6 @@
 const d3 = require('d3');
 
 function realTimeChartLines() {
-  let lines = (data) => data;
   let xScale = d3.time.scale();
   let yScale = d3.scale.linear();
   let xVal = (datum) => datum.x;
@@ -39,7 +38,7 @@ function realTimeChartLines() {
           .attr('clip-path', 'url(#clip)');
 
       // add the paths to the provided selection
-      const dataLines = lineGroup.selectAll('path.line').data(lines(data), (d, i) => i);
+      const dataLines = lineGroup.selectAll('path.line').data(data, (d, i) => i);
       dataLines.enter().append('path')
         .attr('class', 'line')
         .attr('stroke-width', strokeWidth)
@@ -90,12 +89,6 @@ function realTimeChartLines() {
   component.yData = function(value) {
     if (typeof value === 'undefined') return yData;
     yData = value;
-    return component;
-  };
-
-  component.lines = function(value) {
-    if (typeof value === 'undefined') return lines;
-    lines = value;
     return component;
   };
 

@@ -50,11 +50,17 @@ class D3Component extends React.Component {
     const data = this.props.data;
     const maxTime = data.localTime ? data.localTime[data.localTime.length - 1] : new Date();
     const minTime = data.xLength ? new Date(maxTime.getTime() - (data.xLength * 1000)) : maxTime;
+
+    if (!data.localTime) {
+      return;
+    }
+
     this.state.chart
       .width(this.props.width)
       .height(this.props.height)
       .title(data.labels ? data.labels.title : 'Loading...')
       .animationDelay(data.paused ? null : 1000)
+      .singlePointTime(1000)
 
       .xDomain([minTime, maxTime])
       .xVal((d, i) => data.localTime[i])
@@ -66,6 +72,7 @@ class D3Component extends React.Component {
       .yUnits(data.labels ? data.labels.yAxis : '')
       .yData((yValue) => yValue.count)
       .yLabel((yValue) => yValue.line)
+      .yFormat(d3.format('s'))
 
       .y2Domain(data.secondScale ? [0, data.secondScale.currentMax] : null)
       .y2Val((d) => d)
@@ -73,6 +80,7 @@ class D3Component extends React.Component {
       .y2Units(data.secondScale ? data.secondScale.units : '')
       .y2Data((y2Value) => y2Value.count)
       .y2Label((y2Value) => y2Value.line)
+      .y2Format(d3.format('s'))
 
       .defined((d, i) => !data.skip[i])
       .color(d3.scale.ordinal().range(LINE_COLORS))
