@@ -261,6 +261,13 @@ function realTimeLineChart() {
       container
         .selectAll(`svg.${prefix}-chart`)
         .call(mouseOverlay);
+
+      chart.setPosition = function(xPosition) {
+        const nearestXIndex = getNearestXIndex(xPosition);
+        realTimeMouseOverlay.setPosition(xPosition);
+        legend.showValues(nearestXIndex);
+        legend2.showValues(nearestXIndex);
+      };
     });
   }
 
@@ -306,8 +313,8 @@ function realTimeLineChart() {
   /**
    * Set the domain of possible values for the chart.
    *
-   * @param {Array} value - The new domain. For a smooth chart, the bounds of the range should always subtract to the same
-   * value, the maximum timespan to show on the chart
+   * @param {Array} value - The new domain. For a smooth chart, the difference between the upper and lower value should
+   * always be the same timespan, i.e. the maximum timespan to show on the chart
    *
    * @returns {Function|Array} The chart component, or the existing value if none supplied
    */
