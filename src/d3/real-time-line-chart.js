@@ -14,30 +14,35 @@ function realTimeLineChart() {
 
   let width = 520;
   let height = 160;
+
   let prefix = 'serverstats';
   let title = 'CHANGE ME';
+
   let xDomain = [0, 0];
-  let yDomain = [0, 0];
-  let y2Domain = null;
   let xVal = (d) => d.x;
   let xValues = (/* data */) => [];
+
+  let yDomain = [0, 0];
   let yVal = (d) => d.y;
   let yUnits = '';
   let yValues = (/* data */) => [];
   let yData = (yValue, /* i */) => yValue.data;
   let yLabel = (yValue, /* i */) => yValue.label;
+  let yFormat = (d) => d;
+
+  let y2Domain = null;
   let y2Val = (d) => d;
   let y2Units = '';
   let y2Values = (/* data */) => [];
   let y2Data = (y2Value, /* i */ ) => y2Value.data;
   let y2Label = (y2Value, /* i */) => y2Value.label;
+  let y2Format = (d) => d;
+
   let defined = (d) => d.defined;
   let color = d3.scale.category10();
   let strokeWidth = 1;
   let animationDelay = 5000;
   let singlePointTime = 5000;
-  let yFormat = (d) => d;
-  let y2Format = (d) => d;
   let enableMouse = true;
 
   function chart(selection) {

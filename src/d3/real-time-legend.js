@@ -1,7 +1,7 @@
 const d3 = require('d3');
 
 function realTimeLegend() {
-  let label = d => d.label;
+  let label = (d) => d.label;
   let prefix = 'legend';
   let color = d3.scale.category10();
   let bubbleWidth = 8;
