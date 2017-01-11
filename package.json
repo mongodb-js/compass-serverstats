@@ -1,7 +1,7 @@
 {
   "name": "compass-serverstats",
-  "productName": "Compass Compass Serverstats package",
-  "version": "0.0.1",
+  "productName": "Compass Serverstats package",
+  "version": "1.0.0",
   "description": "Compass Real Time Server Stats Component.",
   "main": "index.js",
   "scripts": {
@@ -57,8 +57,5 @@
     "reflux": "^0.4.1",
     "reflux-state-mixin": "^0.7.0",
     "watch": "^0.19.2"
-  },
-  "browser": { },
-  "browserify-shim": {
   }
 }
