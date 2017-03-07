@@ -43,7 +43,7 @@ const GlobalLockStore = Reflux.createStore({
   },
 
   globalLock: function(error, doc, isPaused) {
-    if (!error && doc) {
+    if (!error && doc && 'localTime' in doc && 'globalLock' in doc) {
       if (this.starting) {
         this.starting = false;
         return;
