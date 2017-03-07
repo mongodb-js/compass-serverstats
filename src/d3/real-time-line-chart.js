@@ -10,7 +10,7 @@ function realTimeLineChart() {
   const y2 = d3.scale.linear();
   const bubbleWidth = 8;
   const margin = { top: 25, right: 40, bottom: 45, left: 55 };
-  const dispatch = d3.dispatch('mouseover', 'mousemove', 'mouseout');
+  const dispatch = d3.dispatch('mouseover', 'mouseout');
 
   let width = 520;
   let height = 160;
@@ -44,6 +44,7 @@ function realTimeLineChart() {
   let animationDelay = 5000;
   let singlePointTime = 5000;
   let enableMouse = true;
+  let onOverlay = false;
 
   function chart(selection) {
     selection.each(function(data) {
@@ -131,7 +132,7 @@ function realTimeLineChart() {
       function getNearestXIndex(xPosition) {
         const xValue = x.invert(xPosition);
         const bisectPosition = d3.bisectLeft(xValues(data), xValue);
-        let nearestDefinedPoint = Math.min(bisectPosition, xValues(data).length - 1);
+        let nearestDefinedPoint = Math.max(1, Math.min(bisectPosition, xValues(data).length - 1));
         while (!defined(null, nearestDefinedPoint)) {
           nearestDefinedPoint++;
         }
@@ -141,17 +142,47 @@ function realTimeLineChart() {
         .bubbleWidth(8)
         .strokeWidth(2)
         .enableMouse(enableMouse)
-        .on('reposition', (xPosition) => {
-          const nearestXIndex = getNearestXIndex(xPosition);
+        .title(title)
+        .on('updateoverlay', (xPosition) => {
+          let nearestXIndex = xValues(data).length - 1;
+          let indexOffset = (subWidth + bubbleWidth / 2);
+
+          if (onOverlay && xPosition === undefined) {
+            return;
+          } else if (xPosition !== undefined) {
+            nearestXIndex = getNearestXIndex(xPosition);
+            indexOffset = x(xValues(data)[nearestXIndex]);
+            dispatch.mouseover(nearestXIndex);
+          }
+
           legend.showValues(nearestXIndex);
           legend2.showValues(nearestXIndex);
-          dispatch.mousemove.call(null, nearestXIndex);
+          if (xValues(data).length) {
+            d3.select('text.currentTime').text(d3.time.format('%X')(xValues(data)[nearestXIndex]));
+          }
+
+          if (enableMouse) {
+            d3.select(this).selectAll('g.serverstats-overlay-group')
+              .attr('transform', `translate(${indexOffset})`);
+          }
         })
         .on('mouseover', (xPosition) => {
+          onOverlay = true;
           const nearestXIndex = getNearestXIndex(xPosition);
           dispatch.mouseover(nearestXIndex);
         })
-        .on('mouseout', dispatch.mouseout);
+        .on('mouseout', (zeroPosition) => {
+          onOverlay = false;
+          const lastItem = xValues(data).length - 1;
+          legend.showValues(lastItem);
+          legend2.showValues(lastItem);
+
+          d3.select(this).selectAll('g.serverstats-overlay-group')
+            .attr('transform', `translate(${zeroPosition})`);
+
+          d3.select('text.currentTime').text(d3.time.format('%X')(xValues(data)[lastItem]));
+          dispatch.mouseout();
+        });
 
       /*
        * Setup Elements
@@ -588,10 +619,9 @@ function realTimeLineChart() {
   };
 
   /**
-   * Allows binding to 'mouseover', 'mousemove', and 'mouseout'
-   * events on the chart. 'mouseover', and 'mousemove' events
-   * are triggered with the index of the nearest xValue to the
-   * event
+   * Allows binding to 'mouseover' and 'mouseout' events on the chart.
+   * 'mouseover' events are triggered with the index of the nearest xValue to
+   * the event
    *
    * @param {String} event - The event to listen for
    * @param {Function} listener - The callback to be called when the event occurs
