@@ -1,6 +1,6 @@
 const d3 = require('d3');
 
-const RealTimeEventDispatch = new function() {
+function RealTimeEventDispatch() {
   const charts = {};
   const dispatcher = d3.dispatch('mouseover', 'updatelabels', 'updateoverlay', 'mouseout');
 
@@ -18,7 +18,7 @@ const RealTimeEventDispatch = new function() {
   };
 
   this.dispatch = dispatcher;
-};
+}
 
 
 module.exports = RealTimeEventDispatch;

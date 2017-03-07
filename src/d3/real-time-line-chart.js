@@ -45,6 +45,7 @@ function realTimeLineChart() {
   let singlePointTime = 5000;
   let enableMouse = true;
   let onOverlay = false;
+  let eventDispatcher = null;
 
   function chart(selection) {
     selection.each(function(data) {
@@ -147,6 +148,7 @@ function realTimeLineChart() {
         .strokeWidth(2)
         .enableMouse(enableMouse)
         .title(title)
+        .eventDispatcher(eventDispatcher)
         .on('updateoverlay', (xPosition) => {
           let nearestXIndex = xValues(data).length - 1;
           let indexOffset = (subWidth + bubbleWidth / 2);
@@ -700,6 +702,19 @@ function realTimeLineChart() {
   chart.enableMouse = function(value) {
     if (typeof value === 'undefined') return enableMouse;
     enableMouse = value;
+    return chart;
+  };
+
+  /**
+   * Set the event dispatcher.
+   *
+   * @param {Object} value - the dispatcher.
+   *
+   * @returns {Function|Object} The chart component, or the existing value if none supplied
+   */
+  chart.eventDispatcher = function(value) {
+    if (typeof value === 'undefined') return eventDispatcher;
+    eventDispatcher = value;
     return chart;
   };
 

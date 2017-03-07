@@ -1,5 +1,4 @@
 const d3 = require('d3');
-const RealTimeEventDispatch = require('./real-time-event-dispatch');
 
 function realTimeMouseOverlay() {
   let prefix = 'serverstats-overlay';
@@ -7,6 +6,7 @@ function realTimeMouseOverlay() {
   let strokeWidth = 1;
   let enableMouse = true;
   let title = 'CHANGE ME';
+  let eventDispatcher = null;
 
   function component(selection) {
     selection.each(function(data) {
@@ -44,7 +44,9 @@ function realTimeMouseOverlay() {
       function sendMouseEvents(xPosition) {
         clearInterval(updateMousePosition);
         xPosition = xPosition || d3.mouse(this)[0];
-        RealTimeEventDispatch.dispatch.updateoverlay(xPosition);
+        if (eventDispatcher !== null) {
+          eventDispatcher.dispatch.updateoverlay(xPosition);
+        }
         updateMousePosition = setInterval(sendMouseEvents.bind(this, xPosition), 20);
       }
 
@@ -64,17 +66,23 @@ function realTimeMouseOverlay() {
         mouseTargetEnter
           .on('mouseover', function() {
             const xPosition = d3.mouse(this)[0];
-            RealTimeEventDispatch.dispatch.mouseover(xPosition);
+            if (eventDispatcher !== null) {
+              eventDispatcher.dispatch.mouseover(xPosition);
+            }
           })
           .on('mousemove', sendMouseEvents)
           .on('mouseout', function() {
             clearInterval(updateMousePosition);
-            RealTimeEventDispatch.dispatch.mouseout(basePosition);
+            if (eventDispatcher !== null) {
+              eventDispatcher.dispatch.mouseout(basePosition);
+            }
           });
       }
 
       if (overlayGroup.attr('transform') === `translate(${basePosition})`) {
-        RealTimeEventDispatch.dispatch.updateoverlay();
+        if (eventDispatcher !== null) {
+          eventDispatcher.dispatch.updateoverlay();
+        }
       }
 
       component.setPosition = function(xPosition) {
@@ -96,7 +104,9 @@ function realTimeMouseOverlay() {
   };
 
   component.on = function(event, cb) {
-    RealTimeEventDispatch.on(title, event, cb);
+    if (eventDispatcher !== null) {
+      eventDispatcher.on(title, event, cb);
+    }
     return component;
   };
 
@@ -115,6 +125,12 @@ function realTimeMouseOverlay() {
   component.enableMouse = function(value) {
     if (typeof value === 'undefined') return enableMouse;
     enableMouse = value;
+    return component;
+  };
+
+  component.eventDispatcher = function(value) {
+    if (typeof value === 'undefined') return eventDispatcher;
+    eventDispatcher = value;
     return component;
   };
 
