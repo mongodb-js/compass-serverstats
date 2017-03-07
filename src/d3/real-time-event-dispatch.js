@@ -10,12 +10,10 @@ const RealTimeEventDispatch = new function() {
     }
     charts[event][title] = cb;
 
-    dispatcher.on(event, function(arg) {
-      for (const key in charts[event]) {
-        if (charts[event].hasOwnProperty(key)) {
-          charts[event][key](arg);
-        }
-      }
+    dispatcher.on(event, function(...args) {
+      Object.keys(charts[event]).forEach(key => {
+        charts[event][key](...args);
+      });
     });
   };
 

@@ -132,6 +132,10 @@ function realTimeLineChart() {
       function getNearestXIndex(xPosition) {
         const xValue = x.invert(xPosition);
         const bisectPosition = d3.bisectLeft(xValues(data), xValue);
+        /*
+         * Prevent the overlay from highlighting data that hasn't been animated
+         * yet by preventing the overlay from showing the very last data point.
+         */
         let nearestDefinedPoint = Math.max(1, Math.min(bisectPosition, xValues(data).length - 1));
         while (!defined(null, nearestDefinedPoint)) {
           nearestDefinedPoint++;
