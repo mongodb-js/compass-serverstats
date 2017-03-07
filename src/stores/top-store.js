@@ -22,20 +22,22 @@ const TopStore = Reflux.createStore({
     this.listenTo(Actions.pollTop, this.top_delta);
     this.listenTo(Actions.pause, this.pause);
     this.listenTo(Actions.restart, this.restart);
+    this.listenTo(Actions.suppressTop, this.suppressTop);
     this.listenTo(Actions.mouseOver, this.mouseOver);
     this.listenTo(Actions.mouseOut, this.mouseOut);
   },
 
   restart: function() {
     this.allOps = [];
+    this.errored = [];
     this.isPaused = false;
     this.endPause = 0;
     this.overlayIndex = 0;
     this.inOverlay = false;
     this.xLength = 60;
     this.starting = true;
-    this.error = null;
     this.t1s = {};
+    this.disableTop = false;
   },
 
   pause: function() {
@@ -46,31 +48,60 @@ const TopStore = Reflux.createStore({
   mouseOver: function(index) {
     const startPause = Math.max(this.endPause - this.xLength, 0);
     const visOps = this.allOps.slice(startPause, this.endPause);
+    const visErrors = this.errored.slice(startPause, this.endPause);
     if (index >= visOps.length) {
       index = visOps.length - 1;
     }
     this.overlayIndex = index;
     this.inOverlay = true;
-    this.trigger(null, visOps[this.overlayIndex]);
+    const data = visOps.length === 0 ? [] : visOps[this.overlayIndex];
+    this.trigger(visErrors[this.overlayIndex], data);
   },
 
   mouseOut: function() {
     this.inOverlay = false;
     const startPause = Math.max(this.endPause - this.xLength, 0);
     const visOps = this.allOps.slice(startPause, this.endPause);
-    this.trigger(this.error, visOps[visOps.length - 1]);
+    const visErrors = this.errored.slice(startPause, this.endPause);
+    const data = visOps.length === 0 ? [] : visOps[visOps.length - 1];
+    this.trigger(visErrors[this.overlayIndex], data);
+  },
+
+  suppressTop: function(flag) {
+    this.disableTop = flag;
   },
 
   // Calculate list as current hottest collection (like Cloud and system top)
   top_delta: function() {
+    // stop top command especially if in sharded cluster
+    if (global.dataService.isMongos() || this.disableTop) {
+      return;
+    }
+
     global.dataService.top((error, response) => {
-      const numCores = 4; // app.instance.host.cpu_cores;
-      const cadence = 1000000; // Can safetly assume we're polling 1x/sec TODO
-      const t2s = {};
+      // Trigger error banner changes
+      if (error === null && this.errored.length > 0 && this.errored[this.errored.length - 1] !== null) { // Trigger error removal
+        Actions.dbError({'op': 'top', 'error': null });
+      } else if (error !== null) {
+        Actions.dbError({'op': 'top', 'error': error });
+      }
+      this.errored.push(error);
+      // Update op list if error
+      if (error !== null || this.starting) {
+        this.allOps.push([]);
+      }
+
+      // Update op list if no error
       let totals = [];
-      this.error = error;
-      if (!error && response !== undefined && ('totals' in response)) {
-        const doc = response.totals;
+      if (error === null) {
+        // If response is empty, send empty list
+        let doc = {};
+        if (response !== undefined && ('totals' in response)) {
+          doc = response.totals;
+        }
+        const numCores = 4; // TODO: app.instance.host.cpu_cores;
+        const cadence = 1000000; // Can safetly assume we're polling 1x/sec TODO
+        const t2s = {};
         for (let collname in doc) { // eslint-disable-line prefer-const
           // Ignore special collections
           if (!doc.hasOwnProperty(collname) || collname === 'note' || toNS(collname).specialish) {
@@ -120,17 +151,16 @@ const TopStore = Reflux.createStore({
         });
         // Add current state to all
         this.allOps.push(totals);
-        if (this.isPaused) {
-          totals = this.allOps[this.endPause];
-        } else {
-          this.endPause = this.allOps.length;
-        }
-        // This handled by mouseover function completely
-        if (this.inOverlay) {
-          return;
-        }
-      } else if (error) {
-        Actions.dbError({ 'op': 'top', 'error': error });
+      }
+      if (this.isPaused) {
+        totals = this.allOps[this.endPause];
+        error = this.errored[this.endPause];
+      } else {
+        this.endPause = this.allOps.length;
+      }
+      // This handled by mouseover function completely
+      if (this.inOverlay) {
+        return;
       }
       this.trigger(error, totals);
     });
