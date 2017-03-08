@@ -6,7 +6,7 @@ const OpCountersStore = require('../stores/opcounters-store');
 const NetworkStore = require('../stores/network-store');
 const GlobalLockStore = require('../stores/globallock-store');
 const MemStore = require('../stores/mem-store');
-const EventDispatcher = require('../d3/real-time-event-dispatch');
+const d3 = require('d3');
 
 /**
  * Represents the component that renders all the server stats.
@@ -20,7 +20,7 @@ class ServerStatsComponent extends React.Component {
    */
   constructor(props) {
     super(props);
-    this.eventDispatcher = new EventDispatcher();
+    this.eventDispatcher = d3.dispatch('mouseover', 'updatelabels', 'updateoverlay', 'mouseout');
   }
 
   /**
