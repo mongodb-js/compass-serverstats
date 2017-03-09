@@ -2,7 +2,7 @@ require('babel-register')({ extensions: ['.jsx'] });
 
 const React = require('react');
 const ReactDOM = require('react-dom');
-const DataService = require('mongodb-data-service');
+const { DataServiceStore, DataServiceActions } = require('mongodb-data-service');
 const Connection = require('mongodb-connection-model');
 
 const CONNECTION = new Connection({
@@ -14,11 +14,17 @@ const CONNECTION = new Connection({
 
 const RTSSComponent = require('../../lib/components');
 
-global.dataService = new DataService(CONNECTION);
-global.dataService.connect((error) => {
+DataServiceStore.listen((error, ds) => {
   console.log(error);
-  ReactDOM.render(
-    React.createElement(RTSSComponent, { interval: 1000 }),
-    document.getElementById('container')
-  );
+  if (error) {
+    state.onFatalError('create client');
+  }
+  global.dataService = ds.on('error', state.onFatalError.bind(state, 'create client'));
+
 });
+
+DataServiceActions.connect(CONNECTION);
+ReactDOM.render(
+  React.createElement(RTSSComponent, { interval: 1000 }),
+  document.getElementById('container')
+);
