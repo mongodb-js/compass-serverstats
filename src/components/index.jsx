@@ -19,7 +19,7 @@ class RTSSComponent extends React.Component {
     super(props);
     this.state = {activeTab: 0};
     // this.DatabasesView = app.appRegistry.getComponent('DatabaseDDL.DatabasesView');
-    this.TabNavBar = app.appRegistry.getComponent('App.TabNavBar');
+    // this.TabNavBar = app.appRegistry.getComponent('App.TabNavBar');
   }
 
 
@@ -43,7 +43,7 @@ class RTSSComponent extends React.Component {
    * @returns {React.Component} The component.
    */
   render() {
-    const performanceView = <Performance interval={this.props.interval} />;
+    // const performanceView = <Performance interval={this.props.interval} />;
     // const databasesView = <this.DatabasesView />;
     // return (
     //   <div className="rtss">
@@ -61,7 +61,7 @@ class RTSSComponent extends React.Component {
       <div className="rtss">
         <div className="tab-views">
           <div className="performance-content" class="tab">
-            performanceView
+            <Performance interval={this.props.interval} />
           </div>
         </div>
       </div>
