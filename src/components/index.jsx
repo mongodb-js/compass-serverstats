@@ -65,9 +65,7 @@ class RTSSComponent extends React.Component {
           </div>
         </div>
       </div>
-
-
-    )
+    );
   }
 }
 
