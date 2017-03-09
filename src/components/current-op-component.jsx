@@ -2,15 +2,7 @@ const timer = require('d3-timer');
 const React = require('react');
 const Actions = require('../actions');
 
-/**
- * Block display constant.
- */
-const BLOCK = 'block';
-
-/**
- * None display constant.
- */
-const NONE = 'none';
+// const debug = require('debug')('mongodb-compass:server-stats:current-op-component');
 
 /**
  * Represents the component that renders the current op information.
@@ -26,7 +18,7 @@ class CurrentOpComponent extends React.Component {
    */
   constructor(props) {
     super(props);
-    this.state = { error: null, data: [], display: BLOCK };
+    this.state = { error: null, data: [], display: 'flex' };
   }
 
   /**
@@ -69,14 +61,14 @@ class CurrentOpComponent extends React.Component {
    * Set the component to visible.
    */
   show() {
-    this.setState({ display: BLOCK });
+    this.setState({ display: 'flex' });
   }
 
   /**
    * Set the component to hidden.
    */
   hide() {
-    this.setState({ display: NONE });
+    this.setState({ display: 'none' });
   }
 
   /**
@@ -115,7 +107,11 @@ class CurrentOpComponent extends React.Component {
         <header className="rt-lists__header">
           <h2 className="rt-lists__headerlabel">Slowest Operations</h2>
         </header>
-        <div className="rt-lists__empty-error">&#10004; No Slow Operations</div>
+        <div
+          data-test-id="no-slow-operations"
+          className="rt-lists__empty-error">
+          &#10004; No Slow Operations
+        </div>
       </div>
     );
   }
