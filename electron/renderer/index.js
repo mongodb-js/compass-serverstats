@@ -16,15 +16,12 @@ const RTSSComponent = require('../../lib/components');
 
 DataServiceStore.listen((error, ds) => {
   console.log(error);
-  if (error) {
-    state.onFatalError('create client');
-  }
-  global.dataService = ds.on('error', state.onFatalError.bind(state, 'create client'));
-
 });
 
+DataServiceActions.connectComplete(() => {
+  ReactDOM.render(
+    React.createElement(RTSSComponent, {interval: 1000}),
+    document.getElementById('container')
+  );
+}
 DataServiceActions.connect(CONNECTION);
-ReactDOM.render(
-  React.createElement(RTSSComponent, { interval: 1000 }),
-  document.getElementById('container')
-);
