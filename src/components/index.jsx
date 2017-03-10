@@ -60,14 +60,12 @@ class RTSSComponent extends React.Component {
     return (
       <div className="rtss">
         <div className="tab-views">
-          <div className="performance-content" class="tab">
+          <div className="performance-content tab">
             <Performance interval={this.props.interval} />
           </div>
         </div>
       </div>
-
-
-    )
+    );
   }
 }
 
