@@ -6,10 +6,9 @@ const DBErrorComponent = require('./dberror-component');
 const TimeAndPauseButton = require('./time-and-pause-button');
 const DBErrorStore = require('../stores/dberror-store');
 const ServerStatsStore = require('../stores/server-stats-graphs-store');
-// const app = require('hadron-app');
+const app = require('hadron-app');
 
 // const debug = require('debug')('mongodb-compass:server-stats:performance-component');
-
 
 /**
  * Renders the entire performance tab, including charts and lists.
@@ -18,16 +17,15 @@ class PerformanceComponent extends React.Component {
 
   constructor(props) {
     super(props);
-    // this.StatusRow = app.appRegistry.getComponent('App.StatusRow');
+    this.StatusRow = app.appRegistry.getComponent('App.StatusRow');
   }
 
   renderTopMessage() {
-    return null;
-    // return (
-    //   <this.StatusRow style="warning">
-    //     Top command is not available for mongos, some charts may not show any data.
-    //   </this.StatusRow>
-    // );
+    return (
+      <this.StatusRow style="warning">
+        Top command is not available for mongos, some charts may not show any data.
+      </this.StatusRow>
+    );
   }
 
   /**
