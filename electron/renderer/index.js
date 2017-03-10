@@ -15,13 +15,10 @@ const CONNECTION = new Connection({
 const RTSSComponent = require('../../lib/components');
 
 DataServiceStore.listen((error, ds) => {
-  console.log(error);
-});
-
-DataServiceActions.connectComplete(() => {
   ReactDOM.render(
     React.createElement(RTSSComponent, {interval: 1000}),
     document.getElementById('container')
   );
 });
+
 DataServiceActions.connect(CONNECTION);
