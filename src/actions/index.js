@@ -4,13 +4,11 @@ const Reflux = require('reflux');
  * The actions used by the server stats components.
  */
 const Actions = Reflux.createActions([
-  'pollCurrentOp',
-  'pollTop',
-  'pollServerStats',
   'pause',
   'dbError',
   'showOperationDetails',
   'hideOperationDetails',
+  'suppressTop',
   'restart',
   'mouseOut',
   'mouseOver'
