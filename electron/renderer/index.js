@@ -23,5 +23,5 @@ DataServiceActions.connectComplete(() => {
     React.createElement(RTSSComponent, {interval: 1000}),
     document.getElementById('container')
   );
-}
+});
 DataServiceActions.connect(CONNECTION);

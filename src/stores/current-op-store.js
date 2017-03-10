@@ -10,14 +10,14 @@ const debug = require('debug')('mongodb-compass:server-stats:current-op-store');
 
 /**
  * This store listens to the
- * 'pollCurrentOp' action, fetches the current op data, and
+ * 'currentOpComplete' action, fetches the current op data, and
  * triggers with the result of the command.
  */
 const CurrentOpStore = Reflux.createStore({
 
   /**
    * Initializing the store should set up the listener for
-   * the 'pollCurrentOp' command.
+   * the 'currentOpComplete' command.
    */
   init: function() {
     this.restart();
