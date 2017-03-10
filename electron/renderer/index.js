@@ -4,6 +4,11 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 const { DataServiceStore, DataServiceActions } = require('mongodb-data-service');
 const Connection = require('mongodb-connection-model');
+const app = require('hadron-app');
+const AppRegistry = require('hadron-app-registry');
+const {DatabasesView, StatusRow, TabNavBar} = require('./skeleton-components');
+
+// const debug = require('debug')('mongodb-compass:server-stats');
 
 const CONNECTION = new Connection({
   hostname: '127.0.0.1',
@@ -20,5 +25,11 @@ DataServiceStore.listen((error, ds) => {
     document.getElementById('container')
   );
 });
+
+app.appRegistry = new AppRegistry();
+app.instance = { host: { cpu_cores: 4 } };
+app.appRegistry.registerComponent('App.TabNavBar', TabNavBar);
+app.appRegistry.registerComponent('App.StatusRow', StatusRow);
+app.appRegistry.registerComponent('DatabaseDDL.DatabasesView', DatabasesView);
 
 DataServiceActions.connect(CONNECTION);

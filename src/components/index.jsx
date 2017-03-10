@@ -1,7 +1,7 @@
 const React = require('react');
 const Actions = require('../actions');
 const Performance = require('./performance-component');
-// const app = require('hadron-app');
+const app = require('hadron-app');
 
 // const debug = require('debug')('mongodb-compass:server-stats:RTSSComponent');
 
@@ -18,8 +18,8 @@ class RTSSComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {activeTab: 0};
-    // this.DatabasesView = app.appRegistry.getComponent('DatabaseDDL.DatabasesView');
-    // this.TabNavBar = app.appRegistry.getComponent('App.TabNavBar');
+    this.DatabasesView = app.appRegistry.getComponent('DatabaseDDL.DatabasesView');
+    this.TabNavBar = app.appRegistry.getComponent('App.TabNavBar');
   }
 
 
@@ -43,27 +43,18 @@ class RTSSComponent extends React.Component {
    * @returns {React.Component} The component.
    */
   render() {
-    // const performanceView = <Performance interval={this.props.interval} />;
-    // const databasesView = <this.DatabasesView />;
-    // return (
-    //   <div className="rtss">
-    //     <this.TabNavBar
-    //       theme="light"
-    //       tabs={['Databases', 'Performance']}
-    //       views={[databasesView, performanceView]}
-    //       activeTabIndex={this.state.activeTab}
-    //       onTabClicked={this.onTabClicked.bind(this)}
-    //       className="rt-nav"
-    //     />
-    //   </div>
-    // );
+    const performanceView = <Performance interval={this.props.interval} />;
+    const databasesView = <this.DatabasesView />;
     return (
       <div className="rtss">
-        <div className="tab-views">
-          <div className="performance-content tab">
-            <Performance interval={this.props.interval} />
-          </div>
-        </div>
+        <this.TabNavBar
+          theme="light"
+          tabs={['Databases', 'Performance']}
+          views={[databasesView, performanceView]}
+          activeTabIndex={this.state.activeTab}
+          onTabClicked={this.onTabClicked.bind(this)}
+          className="rt-nav"
+        />
       </div>
     );
   }
