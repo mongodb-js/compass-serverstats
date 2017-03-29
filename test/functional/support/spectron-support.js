@@ -158,11 +158,11 @@ function createApplication() {
 }
 
 /**
- * Call launchCompass in beforeEach for all UI tests:
+ * Call launchWindow in beforeEach for all UI tests:
  *
  * @returns {Promise} Promise that resolves when app starts.
  */
-function launchCompass() {
+function launchWindow() {
   const app = createApplication();
   return app.start().then(() => {
     const client = app.client;
@@ -179,14 +179,14 @@ function launchCompass() {
 }
 
 /**
- * Call quitCompass in afterEach for all UI tests:
+ * Call quitWindow in afterEach for all UI tests:
 
  * @param {Object} app - The running application
  * @param {Function} done - The callback to execute when finished.
  *
  * @returns {Promise}    Promise that resolves when app stops.
  */
-function quitCompass(app, done) {
+function quitWindow(app, done) {
   if (!app || !app.isRunning()) return;
   return app.stop().then(function() {
     assert.equal(app.isRunning(), false);
@@ -194,7 +194,7 @@ function quitCompass(app, done) {
   });
 }
 
-module.exports.launchCompass = launchCompass;
-module.exports.quitCompass = quitCompass;
+module.exports.launchWindow = launchWindow;
+module.exports.quitWindow = quitWindow;
 module.exports.TIMEOUT = TIMEOUT;
 module.exports.LONG_TIMEOUT = LONG_TIMEOUT;

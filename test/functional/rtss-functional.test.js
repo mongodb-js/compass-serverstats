@@ -1,4 +1,4 @@
-const { launchCompass, quitCompass } = require('./support/spectron-support');
+const { launchWindow, quitWindow } = require('./support/spectron-support');
 
 describe('ServerStats Functional Test Suite #spectron', function() {
   this.slow(30000);
@@ -13,7 +13,7 @@ describe('ServerStats Functional Test Suite #spectron', function() {
 
   context('when a MongoDB instance is running', function() {
     before(function(done) {
-      launchCompass().then(function(application) {
+      launchWindow().then(function(application) {
         app = application;
         client = application.client;
         done();
@@ -21,7 +21,7 @@ describe('ServerStats Functional Test Suite #spectron', function() {
     });
 
     after(function(done) {
-      quitCompass(app, done);
+      quitWindow(app, done);
     });
 
     context('when viewing the performance view', function() {
