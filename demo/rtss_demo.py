@@ -14,6 +14,8 @@ elif len(sys.argv) > 2:
 collections = ['coll1', 'coll2', 'coll3']
 dbs = ['db1', 'db2', 'db3']
 
+client = MongoClient(port=port)
+
 # Operations Chart + Network In/Out
 def many_ops(m):
     coll = m[dbs[random.randint(0, len(dbs) - 1)]][collections[random.randint(0, len(collections) - 1)]]
