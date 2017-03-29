@@ -32,6 +32,8 @@ const WAIT_UNTIL_TIMEOUT = 'WaitUntilTimeoutError';
 
 const ROOT = path.join(__dirname, '..', '..', '..');
 
+const ELECTRON_ROOT = path.join(ROOT, 'electron');
+
 const ELECTRON = path.join(ROOT, 'node_modules', 'electron');
 const ELECTRON_PATH = path.join(ELECTRON, 'path.txt');
 const ELECTRON_EXECUTABLE = path.join(ELECTRON, fs.readFileSync(ELECTRON_PATH, { encoding: 'utf8' }));
@@ -149,7 +151,7 @@ function createApplication() {
   process.env.NODE_ENV = 'testing';
   return new Application({
     path: ELECTRON_EXECUTABLE,
-    args: [ ROOT ],
+    args: [ ELECTRON_ROOT ],
     env: process.env,
     cwd: ROOT
   });

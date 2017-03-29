@@ -27,7 +27,6 @@ describe('ServerStats Functional Test Suite #spectron', function() {
     context('when viewing the performance view', function() {
       it('renders the operations graph inserts', function() {
         return client
-          .clickPerformanceTab()
           .getOperationsInserts()
           .should.eventually.equal('0');
       });
