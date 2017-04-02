@@ -11,24 +11,16 @@
     "prepublish": "npm run compile",
     "prestart": "npm run compile",
     "storybook": "start-storybook -p 9001",
-    "hadron-start": "hadron-build develop",
     "start": "electron ./electron",
     "pretest": "mongodb-runner install && mongodb-runner start --port 27018",
     "test": "hadron-build test",
     "posttest": "mongodb-runner stop --port 27018",
     "check": "mongodb-js-precommit ./src/app/*.js ./src/app/**/**/*.js ./src/{app/**/*.js,main/**/*.js} ./test/**/*.js ./src/internal-packages/**/*.js ./src/internal-packages/**/**/*{.js,.jsx} ./src/internal-packages/**/**/**/*{.js,.jsx} ./src/internal-packages/**/**/**/**/*{.js,.jsx}",
     "ci": "npm run check && npm run test",
-    "clean": "hadron-build clean",
-    "compile-ui": "hadron-build ui",
     "fmt": "mongodb-js-fmt ./*.js src/{**/*.js,*.js} test/{**/*.js,*.js}",
-    "release": "hadron-build release",
     "test-unit": "npm test -- --unit",
     "test-enzyme": "npm test -- --enzyme",
-    "test-packages": "npm test -- --packages",
-    "test-main": "npm test -- --main",
-    "test-renderer": "npm test -- --renderer",
-    "test-functional": "npm test -- --functional",
-    "test-release": "npm test -- --release"
+    "test-functional": "npm test -- --functional"
   },
   "precommit": [
     "check"

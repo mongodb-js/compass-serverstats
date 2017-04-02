@@ -100,7 +100,7 @@ describe('ServerStats Functional Test Suite #spectron', function() {
       it('renders the network connections', function() {
         return client
           .getNetworkConnections()
-          .should.eventually.be.at.least('3');
+          .should.eventually.be.at.least('2');
       });
 
       it('renders the memory vsize', function() {
@@ -121,13 +121,13 @@ describe('ServerStats Functional Test Suite #spectron', function() {
           .should.eventually.not.equal(null);
       });
 
-      it.skip('renders the slow operations #race', function() {
+      it('renders the slow operations', function() {
         return client
           .getSlowestOperations()
           .should.eventually.include('No Slow Operations');
       });
 
-      context.skip('when pausing the performance tab #race', function() {
+      context('when pausing the performance tab', function() {
         it('pauses the performance tab', function() {
           return client
             .clickPerformancePauseButton()

@@ -8,39 +8,35 @@ const {shallow} = require('enzyme');
 const AppRegistry = require('hadron-app-registry');
 const { StatusRow } = require('hadron-react-components');
 const ServerStatsStore = require('../../src/stores/server-stats-graphs-store');
+const PerformanceComponent = require('../../src/components/performance-component');
 
 chai.use(chaiEnzyme());
 
 describe('rtss', () => {
-  const appRegistry = app.appRegistry;
   const appDataService = app.dataService;
   const appInstance = app.instance;
 
-  beforeEach(() => {
-    // Mock the AppRegistry with a new one so tests don't complain about
-    // appRegistry.getComponent (i.e. appRegistry being undefined)
-    app.appRegistry = new AppRegistry();
-    app.appRegistry.registerComponent('App.StatusRow', StatusRow);
-    this.performance = require('../../src/components/performance-component');
-  });
   afterEach(() => {
     // Restore properties on the global app object,
     // so they don't affect other tests
-    app.appRegistry = appRegistry;
     app.dataService = appDataService;
     app.instance = appInstance;
   });
 
   context('when connected to a mongos', () => {
+    let component = null;
+
     beforeEach(() => {
       ServerStatsStore.isMongos = true;
-      this.component = shallow(<this.performance interval={1000} />);
+      component = shallow(<PerformanceComponent interval={1000} />);
     });
+
     afterEach(() => {
       ServerStatsStore.isMongos = false;
     });
+
     it('displays the top not available in mongos message', () => {
-      const state = this.component.find(StatusRow);
+      const state = component.find(StatusRow);
       expect(state.dive()).to.have
         .text('Top command is not available for mongos, some charts may not show any data.');
     });
