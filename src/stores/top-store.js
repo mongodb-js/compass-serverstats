@@ -76,8 +76,6 @@ const TopStore = Reflux.createStore({
 
   // Calculate list as current hottest collection (like Cloud and system top)
   top_delta: function(error, response) {
-    console.log(error);
-    console.log(response);
     // stop top command especially if in sharded cluster
     if (error || this.disableTop) {
       return;
