@@ -17,7 +17,6 @@
     "posttest": "mongodb-runner stop --port 27018",
     "check": "mongodb-js-precommit ./src/app/*.js ./src/app/**/**/*.js ./src/{app/**/*.js,main/**/*.js} ./test/**/*.js ./src/internal-packages/**/*.js ./src/internal-packages/**/**/*{.js,.jsx} ./src/internal-packages/**/**/**/*{.js,.jsx} ./src/internal-packages/**/**/**/**/*{.js,.jsx}",
     "fmt": "mongodb-js-fmt ./*.js src/{**/*.js,*.js} test/{**/*.js,*.js}",
-    "test-unit": "npm test -- --unit",
     "test-enzyme": "npm test -- --enzyme",
     "test-functional": "npm test -- --functional"
   },
