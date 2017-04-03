@@ -1,4 +1,3 @@
-module.exports.d3 = require('./lib/d3/');
 const app = require('hadron-app');
 const PerformanceComponent = require('./lib/components/');
 
@@ -25,5 +24,6 @@ function deactivate() {
   app.appRegistry.deregisterRole('Instance.Tab', INSTANCE_TAB_ROLE);
 }
 
+module.exports.d3 = require('./lib/d3/');
 module.exports.activate = activate;
 module.exports.deactivate = deactivate;
