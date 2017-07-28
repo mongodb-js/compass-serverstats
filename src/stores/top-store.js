@@ -23,7 +23,6 @@ const TopStore = Reflux.createStore({
     this.listenTo(Actions.top, this.topDelta);
     this.listenTo(Actions.pause, this.pause);
     this.listenTo(Actions.restart, this.restart);
-    this.listenTo(Actions.suppressTop, this.suppressTop);
     this.listenTo(Actions.mouseOver, this.mouseOver);
     this.listenTo(Actions.mouseOut, this.mouseOut);
   },
@@ -75,19 +74,13 @@ const TopStore = Reflux.createStore({
     this.trigger(visErrors[this.overlayIndex], data);
   },
 
-  suppressTop: function(flag) {
-    this.disableTop = flag;
-  },
-
   // Calculate list as current hottest collection (like Cloud and system top)
   topDelta: function() {
     if (this.dataService) {
       this.dataService.top((error, response) => {
-        // stop top command especially if in sharded cluster
-        if (error || this.disableTop) {
+        if (error) {
           return;
         }
-
         // Trigger error banner changes
         if (error === null && this.errored.length > 0 && this.errored[this.errored.length - 1] !== null) { // Trigger error removal
           Actions.dbError({'op': 'top', 'error': null });
