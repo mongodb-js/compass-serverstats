@@ -32,6 +32,7 @@ const TopStore = Reflux.createStore({
       throw error;
     }
     this.dataService = dataService;
+    this.isMongos = dataService.isMongos();
   },
 
   restart: function() {
@@ -76,11 +77,13 @@ const TopStore = Reflux.createStore({
 
   // Calculate list as current hottest collection (like Cloud and system top)
   topDelta: function() {
+    // early return in mongos since top command is not available
+    if (this.isMongos) {
+      return;
+    }
+
     if (this.dataService) {
       this.dataService.top((error, response) => {
-        if (error) {
-          return;
-        }
         // Trigger error banner changes
         if (error === null && this.errored.length > 0 && this.errored[this.errored.length - 1] !== null) { // Trigger error removal
           Actions.dbError({'op': 'top', 'error': null });
