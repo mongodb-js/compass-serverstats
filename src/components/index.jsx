@@ -1,7 +1,7 @@
 const React = require('react');
-const d3 = require('d3');
 
 const GraphsComponent = require('./server-stats-graphs-component');
+const { realTimeDispatcher } = require('../d3');
 const ListsComponent = require('./server-stats-lists-component');
 const DBErrorComponent = require('./dberror-component');
 const TimeAndPauseButton = require('./time-and-pause-button');
@@ -21,7 +21,7 @@ class PerformanceComponent extends React.Component {
 
   constructor(props) {
     super(props);
-    this.eventDispatcher = d3.dispatch('mouseover', 'updateoverlay', 'mouseout', 'newXValue');
+    this.eventDispatcher = realTimeDispatcher();
   }
 
   renderTopMessage() {
