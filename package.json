@@ -4,6 +4,7 @@
   "version": "10.1.0",
   "description": "Compass Real Time Server Stats Component.",
   "main": "index.js",
+  "browser": "browser.js",
   "scripts": {
     "compile": "npm run jsx && npm run less",
     "jsx": "babel ./src --out-dir ./lib --presets react",

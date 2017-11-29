@@ -46,7 +46,7 @@ function realTimeLineChart() {
   let enableMouse = true;
   let onOverlay = false;
   // Default dispatcher, will be changed to one shared between charts.
-  let eventDispatcher = d3.dispatch('mouseover', 'updatelabels', 'updateoverlay', 'mouseout');
+  let eventDispatcher = d3.dispatch('mouseover', 'updateoverlay', 'mouseout', 'newXValue');
 
   function chart(selection) {
     selection.each(function(data) {
@@ -165,7 +165,7 @@ function realTimeLineChart() {
           legend.showValues(nearestXIndex);
           legend2.showValues(nearestXIndex);
           if (xValues(data).length) {
-            d3.select('text.currentTime').text(d3.time.format('%X')(xValues(data)[nearestXIndex]));
+            eventDispatcher.newXValue(xValues(data)[nearestXIndex]);
           }
 
           if (enableMouse) {

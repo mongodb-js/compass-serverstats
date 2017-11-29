@@ -1,4 +1,5 @@
 const React = require('react');
+const d3 = require('d3');
 
 const GraphsComponent = require('./server-stats-graphs-component');
 const ListsComponent = require('./server-stats-lists-component');
@@ -18,6 +19,11 @@ const INTERVAL = 1000;
  */
 class PerformanceComponent extends React.Component {
 
+  constructor(props) {
+    super(props);
+    this.eventDispatcher = d3.dispatch('mouseover', 'updateoverlay', 'mouseout', 'newXValue');
+  }
+
   renderTopMessage() {
     return (
       <StatusRow style="warning">
@@ -35,14 +41,14 @@ class PerformanceComponent extends React.Component {
     return (
       <section className="rt-perf">
         <div className="controls-container">
-          <TimeAndPauseButton paused={false} />
+          <TimeAndPauseButton paused={false} eventDispatcher={this.eventDispatcher} />
           {ServerStatsStore.isMongos ? this.renderTopMessage() : null}
           <DBErrorComponent store={DBErrorStore} />
         </div>
         <div className="column-container">
           <div className="column main">
             <section className="rt__graphs-out">
-              <GraphsComponent interval={INTERVAL} />
+              <GraphsComponent eventDispatcher={this.eventDispatcher} interval={INTERVAL} />
             </section>
             <section className="rt__lists-out">
               <ListsComponent interval={INTERVAL} />
