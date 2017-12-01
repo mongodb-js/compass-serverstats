@@ -3,6 +3,7 @@ const chaiEnzyme = require('chai-enzyme');
 const expect = chai.expect;
 const enzyme = require('enzyme');
 const React = require('react');
+const d3 = require('d3');
 
 chai.use(chaiEnzyme());
 
@@ -27,11 +28,12 @@ describe('<TimeAndPauseButton />', function() {
 
     context('when the eventDispatcher notifies a newXValue', function() {
       beforeEach(function() {
-        this.dispatcher.newXValue(new Date(1512153289331));
+        this.date = new Date(1512153289331);
+        this.dispatcher.newXValue(this.date);
       });
 
       it('shows the correct time', function() {
-        expect(this.component.find('.currentTime').text()).to.equal('13:34:49');
+        expect(this.component.find('.currentTime').text()).to.equal(d3.time.format('%X')(this.date));
       });
     });
   });
