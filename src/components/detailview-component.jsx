@@ -59,7 +59,7 @@ class DetailViewComponent extends React.Component {
   }
 
   renderZero() {
-    return (<div style={{ display: this.state.display }}></div>);
+    return (<div style={{ display: this.state.display }} />);
   }
 
   renderGraph() {
@@ -67,7 +67,7 @@ class DetailViewComponent extends React.Component {
       <div className="rt-details" style={{ display: this.state.display }}>
         <header className="rt-details__header">
           <h2 className="rt-details__headerlabel">operation details</h2>
-          <div className="rt-details__closebutton" onClick={this.hideOperationDetails.bind(this)}><i className="fa fa-times"></i>
+          <div className="rt-details__closebutton" onClick={this.hideOperationDetails.bind(this)}><i className="fa fa-times" />
   Close</div>
         </header>
         <div className="rt-details__body">

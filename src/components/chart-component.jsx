@@ -123,7 +123,7 @@ class ChartComponent extends React.Component {
   render() {
     return (
       <div className="chart">
-        <div ref="container"></div>
+        <div ref="container" />
       </div>
     );
   }
