@@ -14,7 +14,7 @@
     "prestart": "npm run compile",
     "storybook": "start-storybook -p 9001",
     "start": "electron ./electron",
-    "test": "hadron-build test",
+    "test": "xvfb-maybe hadron-build test",
     "check": "mongodb-js-precommit './src/**/*{.js,.jsx}' './test/**/*.js' index.js",
     "test-unit": "npm test -- --unit",
     "test-enzyme": "npm test -- --enzyme",
@@ -51,6 +51,7 @@
     "chai-as-promised": "^7.1.0",
     "chai-enzyme": "1.0.0-beta.0",
     "cheerio": "^1.0.0-rc.2",
+    "debug": "^4.0.0",
     "electron": "^3.0.7",
     "electron-mocha": "^6.0.1",
     "enzyme": "^3.7.0",
@@ -64,10 +65,10 @@
     "hadron-react-components": "^3.2.2",
     "hadron-spectron": "^5.0.0",
     "jsdom": "^9.4.2",
+    "less": "^3.11.1",
     "less-loader": "^2.2.3",
     "mocha": "^2.5.3",
     "mock-require": "^2.0.1",
-    "mongodb-ns": "^2.0.0",
     "prop-types": "^15.5.8",
     "less": "^3.11.1",
     "mongodb-data-service": "^16.5.6",
@@ -78,6 +79,7 @@
     "reflux-state-mixin": "^0.7.0",
     "sinon": "^1.17.6",
     "sinon-chai": "^2.8.0",
-    "watch": "^0.19.2"
+    "watch": "^0.19.2",
+    "xvfb-maybe": "^0.2.1"
   }
 }
