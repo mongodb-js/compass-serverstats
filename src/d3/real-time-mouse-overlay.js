@@ -73,8 +73,7 @@ function realTimeMouseOverlay() {
             clearInterval(updateMousePosition);
             eventDispatcher.mouseout(basePosition);
           });
-      }
-      else{
+      } else {
         mouseTarget
           .on('mouseover', null)
           .on('mousemove', null)
