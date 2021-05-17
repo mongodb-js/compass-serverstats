@@ -1,3 +1,7 @@
+:warning: This project has been moved to https://github.com/mongodb-js/compass/tree/master/packages/compass-serverstats
+
+---
+
 # compass-serverstats [![][travis_img]][travis_url] [![][npm_img]][npm_url]
 
 > Compass Real Time Server Stats Component.
